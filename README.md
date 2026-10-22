@@ -36,9 +36,9 @@ The `detect` job needs `fetch-depth: 0` because the three-dot diff looks up the
 merge base. Event values are passed through `env:` rather than interpolated
 into the shell, so branch names and shas cannot inject commands.
 
-When no service changed the `test` job is skipped. A skipped job counts as
-passing for branch protection only if it is not listed as a required check
-individually, so require `scripts` and `detect` instead.
+When no service changed the `test` job is skipped. Skipped jobs report as
+passing to branch protection, but matrix jobs get per-service names, so
+require `scripts` and `detect` rather than `test`.
 
 ## Validate
 
