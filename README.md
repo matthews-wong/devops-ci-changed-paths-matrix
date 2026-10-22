@@ -23,3 +23,28 @@ scripts/changed-services.sh origin/main HEAD
 ```
 
 The output is a compact JSON array, ready for `fromJSON` in a job matrix.
+
+## How the workflow decides what to run
+
+| Event | Diff base |
+| --- | --- |
+| `pull_request` | the PR base sha |
+| `push` | `github.event.before` |
+| first push to a branch | none, so every service is tested |
+
+The `detect` job needs `fetch-depth: 0` because the three-dot diff looks up the
+merge base. Event values are passed through `env:` rather than interpolated
+into the shell, so branch names and shas cannot inject commands.
+
+When no service changed the `test` job is skipped. A skipped job counts as
+passing for branch protection only if it is not listed as a required check
+individually, so require `scripts` and `detect` instead.
+
+## Validate
+
+```bash
+make validate   # needs shellcheck and actionlint on PATH
+```
+
+Actions are pinned by full commit sha, permissions default to read-only, and
+a new push cancels the stale pull request run.
